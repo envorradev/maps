@@ -2,12 +2,12 @@
     "name": "envorradev/maps",
     "require": {
         "php": "^8.1",
-        "envorradev/castables": "*",
-        "ramsey/uuid": "5.x-dev"
+        "envorradev/castables": "dev-master",
+        "ramsey/uuid": "^4.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
-        "ramsey/composer-repl": "1.x-dev"
+        "ramsey/composer-repl": "^1.4"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +26,7 @@
             "email": "15961687+samueljtaylor@users.noreply.github.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "config": {
         "allow-plugins": {
             "ramsey/composer-repl": true
