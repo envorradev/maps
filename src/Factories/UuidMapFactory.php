@@ -44,6 +44,26 @@ class UuidMapFactory
     }
 
     /**
+     * @param  array     $items
+     * @param  array     $columns
+     * @param  callable  $callable
+     * @return UuidMap
+     */
+    public static function createUsing(array $items, array $columns, callable $callable): UuidMap
+    {
+        $map = static::emptyMap($columns);
+
+        foreach($items as $key => $item) {
+            $uuid = Uuid::uuid4()->toString();
+            foreach($columns as $column) {
+                $map[$column][$uuid] = $callable($item, $key, $column, $uuid);
+            }
+        }
+
+        return new UuidMap($map);
+    }
+
+    /**
      * @param  array  $nestedArray
      * @param  array  $columnNames
      * @return UuidMap
@@ -56,11 +76,13 @@ class UuidMapFactory
 
     /**
      * @param  array  $names
-     * @param  int    $count
+     * @param  int|null    $count
      * @return array
      */
-    protected static function emptyMap(array $names, int $count): array
+    protected static function emptyMap(array $names, ?int $count = null): array
     {
+        $count ??= count($names);
+
         $map = array_fill(0, $count, []);
 
         if (count($names) === $count) {
