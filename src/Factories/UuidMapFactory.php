@@ -71,8 +71,34 @@ class UuidMapFactory
      */
     public static function createFromNestedArray(array $nestedArray, array $columnNames = []): UuidMap
     {
-        throw new UuidMapFactoryException('Not yet implemented');
+        return static::createFromDottedArray(static::toDottedArray($nestedArray), $columnNames);
     }
+
+    /**
+     * Flatten a multidimensional associative array with dots.
+     *
+     * Adapted from Laravel Arr::dot helper:
+     * @see https://github.com/laravel/framework/blob/9.x/src/Illuminate/Collections/Arr.php#L110
+     *
+     * @param  array  $array
+     * @param  string  $prepend
+     * @return array
+     */
+    protected static function toDottedArray(array $array, string $prepend = ''): array
+    {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value) && ! empty($value)) {
+                $results = array_merge($results, static::toDottedArray($value, $prepend.$key.'.'));
+            } else {
+                $results[$prepend.$key] = $value;
+            }
+        }
+
+        return $results;
+    }
+
 
     /**
      * @param  array  $names
