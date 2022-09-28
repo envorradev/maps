@@ -2,6 +2,9 @@
 
 namespace Envorra\Maps\Contracts;
 
+use Countable;
+use ArrayAccess;
+use IteratorAggregate;
 use Envorra\Castables\Arrayable;
 use Envorra\Castables\Jsonable;
 use Envorra\Castables\Stringable;
@@ -14,7 +17,7 @@ use Envorra\Maps\Exceptions\MapItemNotFound;
  *
  * @template T
  */
-interface Map extends Arrayable, Jsonable, Stringable
+interface Map extends Arrayable, Jsonable, Stringable, ArrayAccess, Countable, IteratorAggregate
 {
     /**
      * @param  mixed  $item
@@ -33,4 +36,25 @@ interface Map extends Arrayable, Jsonable, Stringable
      * @return array
      */
     public function getMap(): array;
+
+    /**
+     * @return T[]
+     */
+    public function all(): array;
+
+    /**
+     * @return T|null
+     */
+    public function first(): mixed;
+
+    /**
+     * @return T|null
+     */
+    public function last(): mixed;
+
+    /**
+     * @param  int  $nth
+     * @return T|null
+     */
+    public function nth(int $nth): mixed;
 }
