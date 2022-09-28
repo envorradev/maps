@@ -35,12 +35,28 @@ class UuidMap extends SimpleMap
     }
 
     /**
+     * @inheritDoc
+     */
+    public function all(): array
+    {
+        return array_values($this->map[$this->lastKey()]);
+    }
+
+    /**
      * @param  string  $uuid
      * @return array
      */
     public function allOfUuid(string $uuid): array
     {
         return array_combine($this->keys, array_column($this->map, $uuid));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function count(): int
+    {
+        return count($this->uuids);
     }
 
     /**
@@ -139,11 +155,35 @@ class UuidMap extends SimpleMap
     }
 
     /**
+     * @inheritDoc
+     */
+    public function first(): mixed
+    {
+        return $this->nth(1);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->all());
+    }
+
+    /**
      * @return string[]
      */
     public function getKeys(): array
     {
         return $this->keys;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMap(): array
+    {
+        return $this->map;
     }
 
     /**
@@ -155,11 +195,69 @@ class UuidMap extends SimpleMap
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
-    public function getMap(): array
+    public function last(): mixed
     {
-        return $this->map;
+        return $this->nth($this->count());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function nth(int $nth): mixed
+    {
+        $nth--;
+        if ($nth < $this->count()) {
+            return $this->map[$this->lastKey()][$this->uuids[$nth]];
+        }
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetExists(mixed $offset): bool
+    {
+        return $this->offsetGet($offset) !== null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetGet(mixed $offset): mixed
+    {
+        if (is_int($offset) && $offset < $this->count()) {
+            return $this->map[$this->lastKey()][$this->uuids[$offset]];
+        }
+
+        if (in_array($offset, $this->keys)) {
+            return array_values($this->map[$offset]);
+        }
+
+        if (in_array($offset, $this->uuids)) {
+            return $this->allOfUuid($offset);
+        }
+
+        return $this->find($offset);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws CannotDirectlyModifyMapData
+     */
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        throw new CannotDirectlyModifyMapData();
+    }
+
+    /**
+     * @inheritDoc
+     * @throws CannotDirectlyModifyMapData
+     */
+    public function offsetUnset(mixed $offset): void
+    {
+        throw new CannotDirectlyModifyMapData();
     }
 
     /**
@@ -177,10 +275,10 @@ class UuidMap extends SimpleMap
     {
         $array = [];
 
-        foreach($this->uuids as $uuid) {
+        foreach ($this->uuids as $uuid) {
             $current = null;
-            foreach($this->allOfUuid($uuid) as $key => $value) {
-                if($key === $this->lastKey()) {
+            foreach ($this->allOfUuid($uuid) as $key => $value) {
+                if ($key === $this->lastKey()) {
                     $array[$current] = $value;
                 } else {
                     $current = is_null($current) ? $value : $current.'.'.$value;
@@ -220,103 +318,5 @@ class UuidMap extends SimpleMap
     {
         $keys = $this->keys;
         return end($keys);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->all());
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function offsetExists(mixed $offset): bool
-    {
-        return $this->offsetGet($offset) !== null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function offsetGet(mixed $offset): mixed
-    {
-        if(is_int($offset) && $offset < $this->count()) {
-            return $this->map[$this->lastKey()][$this->uuids[$offset]];
-        }
-
-        if(in_array($offset, $this->keys)) {
-            return array_values($this->map[$offset]);
-        }
-
-        if(in_array($offset, $this->uuids)) {
-            return $this->allOfUuid($offset);
-        }
-
-        return $this->find($offset);
-    }
-
-    /**
-     * @inheritDoc
-     * @throws CannotDirectlyModifyMapData
-     */
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-        throw new CannotDirectlyModifyMapData();
-    }
-
-    /**
-     * @inheritDoc
-     * @throws CannotDirectlyModifyMapData
-     */
-    public function offsetUnset(mixed $offset): void
-    {
-        throw new CannotDirectlyModifyMapData();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function count(): int
-    {
-        return count($this->uuids);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function all(): array
-    {
-        return array_values($this->map[$this->lastKey()]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function first(): mixed
-    {
-        return $this->nth(1);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function last(): mixed
-    {
-        return $this->nth($this->count());
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function nth(int $nth): mixed
-    {
-        $nth--;
-        if($nth < $this->count()) {
-            return $this->map[$this->lastKey()][$this->uuids[$nth]];
-        }
-        return null;
     }
 }

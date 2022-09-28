@@ -2,7 +2,6 @@
 
 namespace Envorra\Maps;
 
-use Exception;
 use Traversable;
 use ArrayIterator;
 use Envorra\Maps\Exceptions\MapItemNotFound;
@@ -28,6 +27,22 @@ class SimpleMap implements MapContract
     public function __construct(protected array $map = [])
     {
 
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function all(): array
+    {
+        return $this->map;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function count(): int
+    {
+        return count($this->map);
     }
 
     /**
@@ -61,17 +76,9 @@ class SimpleMap implements MapContract
     /**
      * @inheritDoc
      */
-    public function getMap(): array
+    public function first(): mixed
     {
-        return $this->map;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toArray(): array
-    {
-        return $this->map;
+        return $this->nth(1);
     }
 
     /**
@@ -80,6 +87,35 @@ class SimpleMap implements MapContract
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->map);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMap(): array
+    {
+        return $this->map;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function last(): mixed
+    {
+        $items = $this->map;
+        return end($items);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function nth(int $nth): mixed
+    {
+        $nth--;
+        if ($nth < $this->count()) {
+            return $this->map[array_keys($this->map)[$nth]];
+        }
+        return null;
     }
 
     /**
@@ -103,7 +139,7 @@ class SimpleMap implements MapContract
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        if($this->offsetExists($offset) || !is_int($offset)) {
+        if ($this->offsetExists($offset) || !is_int($offset)) {
             $this->map[$offset] = $value;
         } else {
             $this->map[] = $value;
@@ -121,45 +157,8 @@ class SimpleMap implements MapContract
     /**
      * @inheritDoc
      */
-    public function count(): int
-    {
-        return count($this->map);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function all(): array
+    public function toArray(): array
     {
         return $this->map;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function first(): mixed
-    {
-        return $this->nth(1);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function last(): mixed
-    {
-        $items = $this->map;
-        return end($items);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function nth(int $nth): mixed
-    {
-        $nth--;
-        if($nth < $this->count()) {
-            return $this->map[array_keys($this->map)[$nth]];
-        }
-        return null;
     }
 }
