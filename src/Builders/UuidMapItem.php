@@ -57,6 +57,18 @@ class UuidMapItem
     }
 
     /**
+     * @param  array  $items
+     * @return $this
+     */
+    public function children(array $items): self
+    {
+        foreach($items as $item) {
+            $this->child($item);
+        }
+        return $this;
+    }
+
+    /**
      * @return UuidMapItem[]
      */
     public function getChildren(): array
